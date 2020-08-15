@@ -1,0 +1,8 @@
+# jupyter notebook files:
+*.ipynb_checkpoints
+
+# python files:
+*.pyc
+
+# os files:
+*.swp

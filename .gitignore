@@ -1,3 +1,6 @@
+# ignore bin contents:
+bin/*
+
 # jupyter notebook files:
 *.ipynb_checkpoints
 
@@ -6,3 +9,6 @@
 
 # os files:
 *.swp
+
+# exceptions:
+!*.note

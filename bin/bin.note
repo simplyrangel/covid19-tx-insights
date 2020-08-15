@@ -1,2 +1,6 @@
 This directory holds files, images, etc that shouldn't be
 tracked by the git repository.
+
+Spreadsheet data downloaded from Texas DSHS website daily. Spreadsheets
+placed into directories named 'YEAR-MONTH-DATE'. Processes handled by
+download_data.py.

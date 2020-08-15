@@ -1,3 +1,2 @@
-Spreadsheet data downloaded from Texas DSHS website daily. Spreadsheets
-placed into directories named 'YEAR-MONTH-DATE'. Processes handled by
-download_data.py.
+2018_txpopest_county.csv from:
+https://demographics.texas.gov/Data/TPEPP/Estimates/

@@ -1,0 +1,3 @@
+Spreadsheet data downloaded from Texas DSHS website daily. Spreadsheets
+placed into directories named 'YEAR-MONTH-DATE'. Processes handled by
+download_data.py.

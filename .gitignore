@@ -1,5 +1,6 @@
 # ignore bin contents:
 bin/*
+data/*
 
 # jupyter notebook files:
 *.ipynb_checkpoints

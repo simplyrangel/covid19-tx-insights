@@ -10,7 +10,7 @@ import datetime
 def _tx_county_names():
     return pd.read_csv("data/texas_county_names.csv", header=None)[0].tolist()
     
-def read(fi, county_names=_tx_county_names()):
+def read(fi, county_names=_tx_county_names(), datetime_header=False):
     df = pd.read_excel(
         fi, 
         skiprows=[0],
@@ -67,6 +67,10 @@ def read(fi, county_names=_tx_county_names()):
     # remove random strings:
     df = df.replace("--", np.nan)
     df = df.replace("-", np.nan)
+    
+    # set column headers as datetime objects:
+    if datetime_header is True:
+        df.columns = [datetime.datetime.strptime(x, "%Y-%m-%d") for x in df.columns]
 
     # return dataframe:
     return df

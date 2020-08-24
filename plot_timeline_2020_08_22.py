@@ -1,6 +1,7 @@
 """Plot Texas COVID-19 data."""
 import numpy as np
 import pandas as pd
+import datetime
 import matplotlib.pyplot as plt
 import dshstexas
 
@@ -20,6 +21,41 @@ def xaxis_labels(df, n_ticks=6):
     dates_ii = [int(x) for x in dates_ii]
     xaxis_dates = [df.columns[x] for x in dates_ii]
     return xaxis_dates
+
+def mark_event(timeline, df, xloc):
+    for date in timeline.index:
+        if date == timeline.index[-1]:
+            label="statewide health policy event"
+            va="top"
+        else:
+            label=""
+            va="bottom"
+        plt.axhline(
+            date, 
+            linestyle="-", 
+            color="red", 
+            label=label,
+            linewidth=1)
+        text = """%s\n%s\n7 week case average: %d"""%(
+            date.strftime("%Y-%m-%d"), 
+            timeline.loc[date, "event"], 
+            tx_df.loc[date, "weekly_average"])
+        plt.text(
+            xloc,
+            date,
+            text,
+            va=va,
+            ha="right",
+            fontsize=10,
+            color="red")
+
+def metadata(date_pulled):
+    return """Data pulled %s from the
+Texas Department of State Health Services:
+https://dshs.texas.gov/coronavirus/additionaldata.aspx
+
+Code available on Github:
+https://github.com/simplyrangel/covid19-tx-insights"""%date_pulled
 
 # -------------------------------------------------------
 # Read and manipulate data.
@@ -44,7 +80,7 @@ tx_df["weekly_average"] = tx_df.daily.rolling(7).mean()
 # -------------------------------------------------------
 hede = "Texas COVID-19 data\n"
 fig_props = {"figsize": (10,6)}
-landscape_props = {"figsize": (8,16)}
+landscape_props = {"figsize": (7,10)}
 
 # dates misc:
 latest_date = tx_df.index[-1]
@@ -55,9 +91,9 @@ xaxis_dates = xaxis_labels(case_count_df)
 # Portrait figure.
 # -------------------------------------------------------
 # create pdf to store long portrait figure:
-pdf = PdfPages("2020-08-22-cases-timeline.pdf")
+pdf = PdfPages("figures/2020-08-22-cases-timeline.pdf")
 
-# plot figure:
+# plot case data:
 plt.figure(**landscape_props)
 plt.title("%sdaily state cases through %s" %(
     hede, 
@@ -65,9 +101,10 @@ plt.title("%sdaily state cases through %s" %(
 plt.plot(
     tx_df.daily, 
     tx_df.index, 
-    label="daily",
+    label="daily case count",
     alpha=0.3,
-    color="blue")
+    color="blue",
+    linewidth=2)
 plt.plot(
     tx_df.weekly_average, 
     tx_df.index, 
@@ -77,67 +114,35 @@ plt.plot(
     linestyle="--")
 
 # timeline:
-for date in short_timeline.index:
-    if date == short_timeline.index[-1]:
-        label="major health policy event"
-    else:
-        label=""
-    plt.axhline(date, linestyle="--", color="black", linewidth=1, label=label)
+mark_event(short_timeline, tx_df, 17e3)
 
-plt.yticks(xaxis_dates)
+# metadata box:
+plt.text(
+    17e3,
+    tx_df.index[0]-datetime.timedelta(days=4),
+    metadata("2020-08-23"),
+    ha="right",
+    va="top",
+    fontsize=10)
+
+# finish plot:
+plt.yticks(xaxis_dates, rotation=60)
 plt.gca().invert_yaxis()
-plt.xticks(rotation=45)
-plt.xlim([0, 20e3])
-plt.grid()
-plt.legend(loc="upper right")
+plt.xticks(rotation=60)
+plt.xlim([0, 17e3])
+plt.legend(loc="lower right",fontsize=10)
 plt.xlabel("cases per day")
 plt.ylabel("date")
 plt.tight_layout()
 pdf.savefig()
+plt.close()
 
 # close pdf:
 pdf.close()
 
-# -------------------------------------------------------
-# Plot daily cases for entire state.
-# Landscape figure.
-# -------------------------------------------------------
-# plot figure:
-plt.figure(**fig_props)
-plt.title("%sdaily state cases through %s" %(
-    hede, 
-    latest_date.strftime("%Y-%m-%d")))
-plt.scatter(tx_df.index, tx_df.daily, label="daily")
-plt.plot(tx_df.index, tx_df.weekly_average, label="7-day rolling average")
-plt.xticks(xaxis_dates, rotation=45)
-plt.grid()
-plt.legend()
-plt.xlabel("date")
-plt.ylabel("cases per day")
-plt.tight_layout()
-plt.close()
 
-# -------------------------------------------------------
-# Plot cumulative cases for entire state.
-# -------------------------------------------------------
-# plot figure:
-plt.figure(**fig_props)
-plt.title("%scumulative state cases as of %s" %(
-    hede, 
-    latest_date.strftime("%Y-%m-%d")))
-plt.scatter(tx_df.index, tx_df.cumulative, label="state cumulative")
-plt.xticks(xaxis_dates, rotation=45)
-plt.grid()
-plt.legend()
-plt.xlabel("date")
-plt.ylabel("cumulative count")
-plt.tight_layout()
-plt.close()
 
-# -------------------------------------------------------
-# Show plots.
-# -------------------------------------------------------
-plt.show()
+
 
 
 
